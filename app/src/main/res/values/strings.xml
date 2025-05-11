@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">FlashLearn-app</string>
+    <string name="app_logo_description">Flashcard App Logo</string>
+
 </resources>
