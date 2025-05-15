@@ -10,16 +10,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.flashlearn_app.viewmodel.RegisterViewModel
 
 @Composable
 fun RegisterScreen(navController: NavController) {
 
-    var fullName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    val registerViewModel: RegisterViewModel = viewModel()
 
     Box(
         modifier = Modifier
@@ -49,39 +50,73 @@ fun RegisterScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(20.dp))
 
             OutlinedTextField(
-                value = fullName,
-                onValueChange = { fullName = it },
+                value = registerViewModel.fullName,
+                onValueChange = { registerViewModel.fullName = it },
                 label = { Text("Name") },
                 modifier = Modifier.fillMaxWidth()
             )
+            if (registerViewModel.nameError) {
+                Text(
+                    text = "Name must have at least 3 letters.",
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier = Modifier.align(Alignment.Start)
+                )
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = registerViewModel.email,
+                onValueChange = { registerViewModel.email = it },
                 label = { Text("E-mail") },
                 modifier = Modifier.fillMaxWidth()
             )
+            if (registerViewModel.emailError) {
+                Text(
+                    text = "Please enter a valid email",
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier = Modifier.align(Alignment.Start)
+                )
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = registerViewModel.password,
+                onValueChange = { registerViewModel.password = it },
                 label = { Text("Password") },
+                visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth()
             )
+            if (registerViewModel.passwordError) {
+                Text(
+                    text = "The password must have at least 6 characters",
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier = Modifier.align(Alignment.Start)
+                )
+            }
 
             Spacer(modifier = Modifier.height(20.dp))
 
             Button(
                 onClick = {
-                    // Ovdje ide logika registracije
+                    registerViewModel.onRegisterClick()
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Registrar")
+                Text("Register")
+            }
+
+            if (registerViewModel.showSuccess) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "Registration successful!",
+                    color = Color(0xFF2E7D32),
+                    fontSize = 14.sp
+                )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
