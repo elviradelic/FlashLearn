@@ -1,4 +1,4 @@
-package com.example.flashlearn_app.screens
+package com.example.flashlearn_app.screens.register
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -12,11 +12,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import com.example.flashlearn_app.navigation.Screen
+import androidx.navigation.NavController
 
 @Composable
-fun RegisterScreen(navController: NavHostController) {
+fun RegisterScreen(navController: NavController) {
+
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -26,7 +26,7 @@ fun RegisterScreen(navController: NavHostController) {
             .fillMaxSize()
             .background(
                 Brush.linearGradient(
-                    listOf(Color(0xFF0B1E3C), Color(0xFF1976D2))
+                    colors = listOf(Color(0xFF0B1E3C), Color(0xFF1976D2))
                 )
             ),
         contentAlignment = Alignment.Center
@@ -40,19 +40,21 @@ fun RegisterScreen(navController: NavHostController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Registrujte se",
+                text = "Register",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF0B1E3C)
             )
+
             Spacer(modifier = Modifier.height(20.dp))
 
             OutlinedTextField(
                 value = fullName,
                 onValueChange = { fullName = it },
-                label = { Text("Ime") },
+                label = { Text("Name") },
                 modifier = Modifier.fillMaxWidth()
             )
+
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
@@ -61,6 +63,7 @@ fun RegisterScreen(navController: NavHostController) {
                 label = { Text("E-mail") },
                 modifier = Modifier.fillMaxWidth()
             )
+
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
@@ -69,23 +72,24 @@ fun RegisterScreen(navController: NavHostController) {
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth()
             )
+
             Spacer(modifier = Modifier.height(20.dp))
 
             Button(
-                onClick = { /* registracija logika */ },
+                onClick = {
+                    // Ovdje ide logika registracije
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Registracija")
+                Text("Registrar")
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            TextButton(
-                onClick = {
-                    navController.navigate(Screen.Login.route)
-                }
-            ) {
-                Text("Već imate račun? Prijavite se", color = Color(0xFF1976D2))
+            TextButton(onClick = {
+                navController.navigate("login")
+            }) {
+                Text("Already have an account? Sign up", color = Color(0xFF1976D2))
             }
         }
     }

@@ -1,4 +1,5 @@
-package com.example.flashlearn_app.screens
+package com.example.flashlearn_app.screens.login
+
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -12,11 +13,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import com.example.flashlearn_app.navigation.Screen
+import androidx.navigation.NavController
 
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(navController: NavController) {
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -25,7 +26,7 @@ fun LoginScreen(navController: NavHostController) {
             .fillMaxSize()
             .background(
                 Brush.linearGradient(
-                    listOf(Color(0xFF0B1E3C), Color(0xFF1976D2))
+                    colors = listOf(Color(0xFF0B1E3C), Color(0xFF1976D2))
                 )
             ),
         contentAlignment = Alignment.Center
@@ -39,11 +40,12 @@ fun LoginScreen(navController: NavHostController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Prijavi se",
+                text = "Log in to your account",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF0B1E3C)
             )
+
             Spacer(modifier = Modifier.height(20.dp))
 
             OutlinedTextField(
@@ -52,6 +54,7 @@ fun LoginScreen(navController: NavHostController) {
                 label = { Text("E-mail") },
                 modifier = Modifier.fillMaxWidth()
             )
+
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
@@ -60,10 +63,13 @@ fun LoginScreen(navController: NavHostController) {
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth()
             )
+
             Spacer(modifier = Modifier.height(20.dp))
 
             Button(
-                onClick = { /* login logic */ },
+                onClick = {
+                    // login logika ovde
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Login")
@@ -71,12 +77,10 @@ fun LoginScreen(navController: NavHostController) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            TextButton(
-                onClick = {
-                    navController.navigate(Screen.Register.route)
-                }
-            ) {
-                Text("Nemate račun? Registrujte se", color = Color(0xFF1976D2))
+            TextButton(onClick = {
+                navController.navigate("register")
+            }) {
+                Text("Don't have an account? Register.", color = Color(0xFF1976D2))
             }
         }
     }
