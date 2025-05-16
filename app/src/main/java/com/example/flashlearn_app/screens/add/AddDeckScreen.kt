@@ -20,8 +20,8 @@ fun AddDeckScreen(
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
 
-    val backgroundColor = Color(0xFF0A1A33) // Night Navy
-    val accentColor = Color(0xFF00A3FF)     // Electric Blue
+    val backgroundColor = Color(0xFF0A1A33)
+    val accentColor = Color(0xFF00A3FF)
 
     Column(
         modifier = Modifier

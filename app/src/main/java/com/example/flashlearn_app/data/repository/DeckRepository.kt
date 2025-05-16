@@ -14,7 +14,10 @@ class DeckRepository {
     val decks: StateFlow<List<Deck>> = _decks
 
     fun addDeck(deck: Deck) {
-        _decks.value = _decks.value + deck
+        val nextId = (_decks.value.maxOfOrNull { it.id } ?: 0) + 1
+        val newDeck = deck.copy(id = nextId)
+        _decks.value = _decks.value + newDeck
     }
+
 }
 

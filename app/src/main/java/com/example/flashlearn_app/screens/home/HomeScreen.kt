@@ -26,6 +26,7 @@ import com.example.flashlearn_app.R
 import com.example.flashlearn_app.Screen
 import com.example.flashlearn_app.viewmodel.DeckViewModel
 
+
 @Composable
 fun HomeScreen(
     navController: NavController,
@@ -51,11 +52,7 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.Top
         ) {
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "Menu",
-                tint = Color.White
-            )
+            Icon(Icons.Default.Menu, contentDescription = "Menu", tint = Color.White)
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(
                     painter = painterResource(id = R.drawable.card_logo),
@@ -71,11 +68,7 @@ fun HomeScreen(
                     fontWeight = FontWeight.Bold
                 )
             }
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "Profile",
-                tint = Color.White
-            )
+            Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White)
         }
 
         // Search
@@ -115,7 +108,12 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .height(90.dp)
                         .clickable {
-                            // TODO: navigacija do deck details kasnije
+                            navController.navigate(
+                                Screen.CardList.passArgs(
+                                    deck.id,
+                                    deck.title
+                                )
+                            )
                         }
                 ) {
                     Column(
@@ -154,11 +152,7 @@ fun HomeScreen(
                         }
                 ) {
                     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add",
-                            tint = Color.White
-                        )
+                        Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.White)
                     }
                 }
             }
