@@ -14,4 +14,8 @@ class DeckViewModel : ViewModel() {
 
     val decks: StateFlow<List<Deck>> = repository.decks
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun addDeck(deck: Deck) {
+        repository.addDeck(deck)
+    }
 }

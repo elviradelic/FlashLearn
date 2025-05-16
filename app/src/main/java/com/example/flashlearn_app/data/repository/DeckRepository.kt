@@ -1,19 +1,20 @@
 package com.example.flashlearn_app.data.repository
 
 import com.example.flashlearn_app.data.model.Deck
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class DeckRepository {
 
-    private val _decks = MutableStateFlow(
-        listOf(
-            Deck(1, "English", "Map content", 12),
-            Deck(2, "Deutsch", "Map content", 8),
-            Deck(3, "Français", "Map content", 5)
-        )
-    )
+    private val _decks = MutableStateFlow<List<Deck>>(listOf(
+        Deck(title = "English", description = "Map content"),
+        Deck(title = "Deutsch", description = "Map content"),
+        Deck(title = "Français", description = "Map content")
+    ))
+    val decks: StateFlow<List<Deck>> = _decks
 
-    val decks: Flow<List<Deck>> = _decks.asStateFlow()
+    fun addDeck(deck: Deck) {
+        _decks.value = _decks.value + deck
+    }
 }
+

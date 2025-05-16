@@ -1,7 +1,7 @@
 package com.example.flashlearn_app.screens.home
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,14 +21,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.flashlearn_app.R
+import com.example.flashlearn_app.Screen
 import com.example.flashlearn_app.viewmodel.DeckViewModel
 
 @Composable
-fun HomeScreen(deckViewModel: DeckViewModel = viewModel()) {
-    val backgroundColor = Color(0xFF0A1A33) // Night Navy
-    val borderColor = Color(0xFF00A3FF) // Electric Blue
+fun HomeScreen(
+    navController: NavController,
+    deckViewModel: DeckViewModel
+) {
+    val backgroundColor = Color(0xFF0A1A33)
+    val borderColor = Color(0xFF00A3FF)
 
     var searchQuery by remember { mutableStateOf("") }
     val decks by deckViewModel.decks.collectAsState()
@@ -74,7 +78,7 @@ fun HomeScreen(deckViewModel: DeckViewModel = viewModel()) {
             )
         }
 
-        // Search field
+        // Search
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
@@ -97,7 +101,7 @@ fun HomeScreen(deckViewModel: DeckViewModel = viewModel()) {
                 .padding(bottom = 24.dp)
         )
 
-        // Deck list
+        // Decks
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxSize()
@@ -110,7 +114,9 @@ fun HomeScreen(deckViewModel: DeckViewModel = viewModel()) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(90.dp)
-                        .clickable { /* TODO */ }
+                        .clickable {
+                            // TODO: navigacija do deck details kasnije
+                        }
                 ) {
                     Column(
                         modifier = Modifier
@@ -134,6 +140,7 @@ fun HomeScreen(deckViewModel: DeckViewModel = viewModel()) {
                 }
             }
 
+            // Add New Deck
             item {
                 Card(
                     shape = RoundedCornerShape(12.dp),
@@ -142,10 +149,16 @@ fun HomeScreen(deckViewModel: DeckViewModel = viewModel()) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(80.dp)
-                        .clickable { /* TODO */ }
+                        .clickable {
+                            navController.navigate(Screen.AddDeck.route)
+                        }
                 ) {
                     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                        Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.White)
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add",
+                            tint = Color.White
+                        )
                     }
                 }
             }
