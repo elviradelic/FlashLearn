@@ -16,11 +16,22 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.flashlearn_app.viewmodel.LoginViewModel
+import com.example.flashlearn_app.Screen
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
 fun LoginScreen(navController: NavController) {
 
     val loginViewModel: LoginViewModel = viewModel()
+
+    // Navigacija nakon uspješnog login-a
+    if (loginViewModel.showSuccess) {
+        LaunchedEffect(Unit) {
+            navController.navigate(Screen.Home.route) {
+                popUpTo(Screen.Login.route) { inclusive = true }
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -95,19 +106,10 @@ fun LoginScreen(navController: NavController) {
                 Text("Login")
             }
 
-            if (loginViewModel.showSuccess) {
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    text = "Login successful!",
-                    color = Color(0xFF2E7D32),
-                    fontSize = 14.sp
-                )
-            }
-
             Spacer(modifier = Modifier.height(12.dp))
 
             TextButton(onClick = {
-                navController.navigate("register")
+                navController.navigate(Screen.Register.route)
             }) {
                 Text("Don't have an account? Register.", color = Color(0xFF1976D2))
             }
