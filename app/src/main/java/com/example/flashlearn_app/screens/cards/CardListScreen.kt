@@ -27,6 +27,7 @@ fun CardListScreen(
 ) {
     val backgroundColor = Color(0xFF0A1A33)
     val accentColor = Color(0xFF00A3FF)
+    val deleteColor = Color(0xFFD32F2F)
 
     LaunchedEffect(id, deckTitle) {
         cardViewModel.setSelectedDeck(deckId = id, deckTitle = deckTitle)
@@ -74,6 +75,34 @@ fun CardListScreen(
                         Text(card.front, fontWeight = FontWeight.Bold, color = Color.Black)
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(card.back, color = Color.DarkGray)
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            TextButton(
+                                onClick = {
+                                    navController.navigate(
+                                        Screen.EditCard.passArgs(
+                                            card.id,
+                                            card.front,
+                                            card.back
+                                        )
+                                    )
+                                }
+                            ) {
+                                Text("Edit", color = accentColor)
+                            }
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            TextButton(
+                                onClick = { cardViewModel.deleteCard(card) }
+                            ) {
+                                Text("Delete", color = deleteColor)
+                            }
+                        }
                     }
                 }
             }
@@ -81,12 +110,9 @@ fun CardListScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Navigacija ka AddCardScreen
         Button(
             onClick = {
-                navController.navigate(
-                    Screen.AddCard.passArgs(id, deckTitle)
-                )
+                navController.navigate(Screen.AddCard.passArgs(id, deckTitle))
             },
             colors = ButtonDefaults.buttonColors(containerColor = accentColor),
             modifier = Modifier.fillMaxWidth()

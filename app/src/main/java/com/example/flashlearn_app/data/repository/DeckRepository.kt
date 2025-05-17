@@ -9,7 +9,7 @@ class DeckRepository {
     private val _decks = MutableStateFlow<List<Deck>>(listOf(
         Deck(title = "English", description = "Map content"),
         Deck(title = "Deutsch", description = "Map content"),
-        Deck(title = "Français", description = "Map content")
+        Deck(title = "Franch", description = "Map content")
     ))
     val decks: StateFlow<List<Deck>> = _decks
 

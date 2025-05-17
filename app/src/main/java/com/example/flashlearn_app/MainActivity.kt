@@ -13,6 +13,7 @@ import androidx.navigation.navArgument
 import com.example.flashlearn_app.screens.add.AddDeckScreen
 import com.example.flashlearn_app.screens.cards.AddCardScreen
 import com.example.flashlearn_app.screens.cards.CardListScreen
+import com.example.flashlearn_app.screens.cards.EditCardScreen
 import com.example.flashlearn_app.screens.details.DeckDetailScreen
 import com.example.flashlearn_app.screens.home.HomeScreen
 import com.example.flashlearn_app.screens.login.LoginScreen
@@ -58,6 +59,14 @@ sealed class Screen(val route: String) {
         fun passArgs(id: Int, deckTitle: String): String =
             "addCard/$id/${deckTitle.trim()}"
     }
+
+    object EditCard : Screen("editCard/{cardId}/{front}/{back}") {
+        fun passArgs(cardId: Int?, front: String, back: String): String =
+            "editCard/${cardId ?: 0}/${front.trim()}/${back.trim()}"
+    }
+
+
+
 }
 
 @Composable
@@ -112,7 +121,6 @@ fun AppNavigation(
                 description = description ?: "",
                 navController = navController
             )
-
         }
 
         composable(
@@ -147,6 +155,27 @@ fun AppNavigation(
             AddCardScreen(
                 deckId = id,
                 deckTitle = deckTitle,
+                cardViewModel = cardViewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = Screen.EditCard.route,
+            arguments = listOf(
+                navArgument("cardId") { type = NavType.IntType },
+                navArgument("front") { type = NavType.StringType },
+                navArgument("back") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val cardId = backStackEntry.arguments?.getInt("cardId") ?: 0
+            val front = backStackEntry.arguments?.getString("front") ?: ""
+            val back = backStackEntry.arguments?.getString("back") ?: ""
+
+            EditCardScreen(
+                cardId = cardId,
+                initialFront = front,
+                initialBack = back,
                 cardViewModel = cardViewModel,
                 onNavigateBack = { navController.popBackStack() }
             )

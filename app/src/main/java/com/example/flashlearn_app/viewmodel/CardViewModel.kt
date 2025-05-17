@@ -33,4 +33,13 @@ class CardViewModel : ViewModel() {
     fun addCard(card: Card) {
         repository.addCard(card)
     }
+
+    fun deleteCard(card: Card) {
+        repository.deleteCard(card)
+    }
+
+    fun updateCard(cardId: Int, front: String, back: String) {
+        repository.updateCard(cardId, front, back)
+    }
+
 }
