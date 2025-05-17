@@ -4,8 +4,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.flashlearn_app.data.dao.UserDao
+import kotlinx.coroutines.launch
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(private val userDao: UserDao) : ViewModel() {
 
     var email by mutableStateOf("")
     var password by mutableStateOf("")
@@ -14,22 +17,22 @@ class LoginViewModel : ViewModel() {
     var showSuccess by mutableStateOf(false)
 
     fun onLoginClick() {
-        // Reset stanja
         emailError = false
         passwordError = false
         showSuccess = false
 
-        // Validacija
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailError = true
-        }
-
-        if (password.length < 6) {
-            passwordError = true
-        }
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) emailError = true
+        if (password.length < 6) passwordError = true
 
         if (!emailError && !passwordError) {
-            showSuccess = true
+            viewModelScope.launch {
+                val user = userDao.login(email, password)
+                showSuccess = user != null
+                if (user == null) {
+                    emailError = true
+                    passwordError = true
+                }
+            }
         }
     }
 }

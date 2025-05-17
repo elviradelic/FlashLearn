@@ -1,10 +1,13 @@
 package com.example.flashlearn_app.data.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "cards")
 data class Card(
-    val id: Int? = null,  // omogućava da se postavi automatski
+    @PrimaryKey(autoGenerate = true) val id: Int? = null,
     val front: String,
     val back: String,
-    val deckId: Int,        // povezuje karticu s deckom
+    val deckId: Int,
     val deckTitle: String
 )
-

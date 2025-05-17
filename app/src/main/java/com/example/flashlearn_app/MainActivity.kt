@@ -6,10 +6,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
+import com.example.flashlearn_app.data.FlashLearnDatabase
+import com.example.flashlearn_app.data.dao.UserDao
 import com.example.flashlearn_app.screens.add.AddDeckScreen
 import com.example.flashlearn_app.screens.cards.AddCardScreen
 import com.example.flashlearn_app.screens.cards.CardListScreen
@@ -22,17 +26,33 @@ import com.example.flashlearn_app.screens.splash.SplashScreen
 import com.example.flashlearn_app.ui.theme.FlashLearnappTheme
 import com.example.flashlearn_app.viewmodel.CardViewModel
 import com.example.flashlearn_app.viewmodel.DeckViewModel
+import com.example.flashlearn_app.viewmodel.LoginViewModel
+import com.example.flashlearn_app.viewmodel.RegisterViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val db = FlashLearnDatabase.getDatabase(applicationContext)
+        val deckDao = db.deckDao()
+        val cardDao = db.cardDao()
+        val userDao = db.userDao()
         setContent {
             FlashLearnappTheme {
                 val navController = rememberNavController()
-                val deckViewModel: DeckViewModel = viewModel()
-                val cardViewModel: CardViewModel = viewModel()
-                AppNavigation(navController, deckViewModel, cardViewModel)
+                val deckViewModel: DeckViewModel = viewModel(
+                    factory = viewModelFactory {
+                        initializer { DeckViewModel(deckDao) }
+                    }
+                )
+                val cardViewModel: CardViewModel = viewModel(
+                    factory = viewModelFactory {
+                        initializer { CardViewModel(cardDao) }
+                    }
+                )
+
+                AppNavigation(navController, deckViewModel, cardViewModel, userDao)
             }
         }
     }
@@ -73,7 +93,8 @@ sealed class Screen(val route: String) {
 fun AppNavigation(
     navController: NavHostController,
     deckViewModel: DeckViewModel,
-    cardViewModel: CardViewModel
+    cardViewModel: CardViewModel,
+    userDao: UserDao
 ) {
     NavHost(navController = navController, startDestination = Screen.Splash.route) {
 
@@ -82,11 +103,17 @@ fun AppNavigation(
         }
 
         composable(Screen.Login.route) {
-            LoginScreen(navController)
+            val loginViewModel: LoginViewModel = viewModel(
+                factory = viewModelFactory { initializer { LoginViewModel(userDao) } }
+            )
+            LoginScreen(navController, loginViewModel)
         }
 
         composable(Screen.Register.route) {
-            RegisterScreen(navController)
+            val registerViewModel: RegisterViewModel = viewModel(
+                factory = viewModelFactory { initializer { RegisterViewModel(userDao) } }
+            )
+            RegisterScreen(navController, registerViewModel)
         }
 
         composable(Screen.Home.route) {
