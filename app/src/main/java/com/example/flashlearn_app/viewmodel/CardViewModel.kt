@@ -2,28 +2,25 @@ package com.example.flashlearn_app.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.flashlearn_app.data.dao.CardDao
 import com.example.flashlearn_app.data.model.Card
-import com.example.flashlearn_app.data.repository.CardRepository
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
-class CardViewModel : ViewModel() {
+class CardViewModel(private val cardDao: CardDao) : ViewModel() {
 
-    private val repository = CardRepository()
-
-    // Držimo trenutno selektovani deck ID i naziv
     private val _selectedDeckId = MutableStateFlow(0)
     private val _selectedDeckTitle = MutableStateFlow("")
 
     val selectedDeckTitle: StateFlow<String> = _selectedDeckTitle
     val selectedDeckId: StateFlow<Int> = _selectedDeckId
 
-    // Filtrirani cardovi na osnovu deck ID-a
-    val cards: StateFlow<List<Card>> = combine(
-        repository.cards,
-        _selectedDeckId
-    ) { allCards, deckId ->
-        allCards.filter { it.deckId == deckId }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val cards: StateFlow<List<Card>> = _selectedDeckId
+        .flatMapLatest { deckId ->
+            if (deckId == 0) flowOf(emptyList())
+            else cardDao.getCardsForDeck(deckId)
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun setSelectedDeck(deckId: Int, deckTitle: String) {
         _selectedDeckId.value = deckId
@@ -31,15 +28,23 @@ class CardViewModel : ViewModel() {
     }
 
     fun addCard(card: Card) {
-        repository.addCard(card)
+        viewModelScope.launch {
+            cardDao.insert(card)
+        }
     }
 
     fun deleteCard(card: Card) {
-        repository.deleteCard(card)
+        viewModelScope.launch {
+            cardDao.delete(card)
+        }
     }
 
-    fun updateCard(cardId: Int, front: String, back: String) {
-        repository.updateCard(cardId, front, back)
+    fun updateCard(cardId: Int, newFront: String, newBack: String) {
+        viewModelScope.launch {
+            val updatedCard = cards.value.find { it.id == cardId }?.copy(front = newFront, back = newBack)
+            if (updatedCard != null) {
+                cardDao.update(updatedCard)
+            }
+        }
     }
-
 }

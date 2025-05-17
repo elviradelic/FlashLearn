@@ -13,15 +13,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.flashlearn_app.viewmodel.RegisterViewModel
 
 @Composable
-fun RegisterScreen(navController: NavController) {
-
-    val registerViewModel: RegisterViewModel = viewModel()
-
+fun RegisterScreen(
+    navController: NavController,
+    registerViewModel: RegisterViewModel
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()

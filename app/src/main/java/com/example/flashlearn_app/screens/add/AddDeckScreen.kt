@@ -32,7 +32,7 @@ fun AddDeckScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Add New Deck",
+            text = "Add New com.example.flashlearn_app.data.model.Deck",
             fontSize = 22.sp,
             color = Color.White
         )
@@ -98,7 +98,7 @@ fun AddDeckScreen(
                 .height(50.dp),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Text("Add Deck", color = Color.White)
+            Text("Add com.example.flashlearn_app.data.model.Deck", color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(16.dp))

@@ -29,7 +29,7 @@ fun DeckDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = title ?: "Deck Details",
+                        text = title ?: "com.example.flashlearn_app.data.model.Deck Details",
                         color = Color.White
                     )
                 },
@@ -58,7 +58,7 @@ fun DeckDetailScreen(
         ) {
             Column {
                 Text(
-                    text = title ?: "Untitled Deck",
+                    text = title ?: "Untitled com.example.flashlearn_app.data.model.Deck",
                     fontSize = 26.sp,
                     color = Color.White,
                     fontWeight = FontWeight.Bold

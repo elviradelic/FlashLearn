@@ -4,8 +4,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.flashlearn_app.data.dao.UserDao
+import com.example.flashlearn_app.data.model.User
+import kotlinx.coroutines.launch
 
-class RegisterViewModel : ViewModel() {
+class RegisterViewModel(private val userDao: UserDao) : ViewModel() {
 
     var fullName by mutableStateOf("")
     var email by mutableStateOf("")
@@ -18,28 +22,25 @@ class RegisterViewModel : ViewModel() {
     var showSuccess by mutableStateOf(false)
 
     fun onRegisterClick() {
-        // Reset stanja
         nameError = false
         emailError = false
         passwordError = false
         showSuccess = false
 
-        // Validacije
-        if (fullName.length < 3) {
-            nameError = true
-        }
+        if (fullName.length < 3) nameError = true
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) emailError = true
+        if (password.length < 6) passwordError = true
 
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailError = true
-        }
-
-        if (password.length < 6) {
-            passwordError = true
-        }
-
-        // Ako je sve validno
         if (!nameError && !emailError && !passwordError) {
-            showSuccess = true
+            viewModelScope.launch {
+                val existing = userDao.getUserByEmail(email)
+                if (existing == null) {
+                    userDao.insert(User(fullName = fullName, email = email, password = password))
+                    showSuccess = true
+                } else {
+                    emailError = true
+                }
+            }
         }
     }
 }

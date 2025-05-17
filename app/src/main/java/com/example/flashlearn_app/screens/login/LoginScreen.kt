@@ -13,18 +13,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.flashlearn_app.viewmodel.LoginViewModel
 import com.example.flashlearn_app.Screen
 import androidx.compose.runtime.LaunchedEffect
 
 @Composable
-fun LoginScreen(navController: NavController) {
-
-    val loginViewModel: LoginViewModel = viewModel()
-
-    // Navigacija nakon uspješnog login-a
+fun LoginScreen(
+    navController: NavController,
+    loginViewModel: LoginViewModel
+) {
     if (loginViewModel.showSuccess) {
         LaunchedEffect(Unit) {
             navController.navigate(Screen.Home.route) {
