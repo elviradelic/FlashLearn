@@ -4,18 +4,40 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.flashlearn_app.data.model.Deck
 import com.example.flashlearn_app.data.repository.DeckRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DeckViewModel : ViewModel() {
+@HiltViewModel
+class DeckViewModel @Inject constructor(
+    private val deckRepository: DeckRepository
+) : ViewModel() {
 
-    private val repository = DeckRepository()
-
-    val decks: StateFlow<List<Deck>> = repository.decks
+    val decks: StateFlow<List<Deck>> = deckRepository.getAllDecks()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    fun addDeck(deck: Deck) {
-        repository.addDeck(deck)
+    fun insertDeck(deck: Deck) {
+        viewModelScope.launch {
+            deckRepository.insert(deck)
+        }
+    }
+
+    fun updateDeck(deck: Deck) {
+        viewModelScope.launch {
+            deckRepository.update(deck)
+        }
+    }
+
+    fun deleteDeck(deck: Deck) {
+        viewModelScope.launch {
+            deckRepository.delete(deck)
+        }
+    }
+
+    suspend fun getDeckById(deckId: Int): Deck? {
+        return deckRepository.getDeckById(deckId)
     }
 }

@@ -4,43 +4,76 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.flashlearn_app.Screen
+import com.example.flashlearn_app.navigation.Screen
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.activity.compose.BackHandler
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.Alignment
+
+
+
+
+import com.example.flashlearn_app.viewmodel.CardViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeckDetailScreen(
-    id: Int?,
-    title: String?,
-    description: String?,
-    navController: NavController
+    id: Int,
+    title: String,
+    description: String,
+    navController: NavController,
+    cardViewModel: CardViewModel = hiltViewModel()
 ) {
     val backgroundColor = Color(0xFF0A1A33)
     val accentColor = Color(0xFF00A3FF)
+
+    var cardCount by remember { mutableStateOf(0) }
+    val scope = rememberCoroutineScope()
+
+    BackHandler(onBack = {
+        navController.popBackStack()
+    })
+
+
+    LaunchedEffect(id) {
+        scope.launch {
+            cardViewModel.getCardsForDeck(id).collect {
+                cardCount = it.size
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = title ?: "Deck Details",
-                        color = Color.White
-                    )
+                    Text(text = title, color = Color.White)
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clickable { navController.popBackStack() }
+                            .padding(12.dp)
+                    ) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color.White
+                            tint = Color.White,
+                            modifier = Modifier.align(Alignment.Center)
                         )
                     }
+
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = backgroundColor
@@ -58,7 +91,7 @@ fun DeckDetailScreen(
         ) {
             Column {
                 Text(
-                    text = title ?: "Untitled Deck",
+                    text = title,
                     fontSize = 26.sp,
                     color = Color.White,
                     fontWeight = FontWeight.Bold
@@ -67,7 +100,7 @@ fun DeckDetailScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = description ?: "No description available.",
+                    text = description,
                     fontSize = 16.sp,
                     color = Color.LightGray
                 )
@@ -75,7 +108,7 @@ fun DeckDetailScreen(
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Text(
-                    text = "This deck has 0 cards.",
+                    text = "This deck has $cardCount cards.",
                     color = Color.White.copy(alpha = 0.7f),
                     fontSize = 14.sp
                 )
@@ -84,12 +117,7 @@ fun DeckDetailScreen(
             Column {
                 Button(
                     onClick = {
-                        navController.navigate(
-                            Screen.CardList.passArgs(
-                                id = id ?: 0,
-                                deckTitle = title ?: ""
-                            )
-                        )
+                        navController.navigate(Screen.CardList.passArgs(id, title))
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -104,12 +132,7 @@ fun DeckDetailScreen(
 
                 OutlinedButton(
                     onClick = {
-                        navController.navigate(
-                            Screen.AddCard.passArgs(
-                                id = id ?: 0,
-                                deckTitle = title ?: ""
-                            )
-                        )
+                        navController.navigate(Screen.AddCard.passArgs(id, title))
                     },
                     modifier = Modifier
                         .fillMaxWidth()

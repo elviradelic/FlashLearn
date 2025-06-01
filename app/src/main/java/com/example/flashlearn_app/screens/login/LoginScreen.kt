@@ -13,25 +13,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.flashlearn_app.viewmodel.LoginViewModel
-import com.example.flashlearn_app.Screen
-import androidx.compose.runtime.LaunchedEffect
+import com.example.flashlearn_app.viewmodel.UserViewModel
+import com.example.flashlearn_app.navigation.Screen
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(navController: NavController) {
 
-    val loginViewModel: LoginViewModel = viewModel()
+    val userViewModel: UserViewModel = hiltViewModel()
+    val coroutineScope = rememberCoroutineScope()
 
-    // Navigacija nakon uspješnog login-a
-    if (loginViewModel.showSuccess) {
-        LaunchedEffect(Unit) {
-            navController.navigate(Screen.Home.route) {
-                popUpTo(Screen.Login.route) { inclusive = true }
-            }
-        }
-    }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var loginError by remember { mutableStateOf<String?>(null) }
 
     Box(
         modifier = Modifier
@@ -61,37 +59,28 @@ fun LoginScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(20.dp))
 
             OutlinedTextField(
-                value = loginViewModel.email,
-                onValueChange = { loginViewModel.email = it },
+                value = email,
+                onValueChange = { email = it },
                 label = { Text("E-mail") },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            if (loginViewModel.emailError) {
-                Text(
-                    text = "Please enter a valid email",
-                    color = Color.Red,
-                    fontSize = 12.sp,
-                    modifier = Modifier.align(Alignment.Start)
-                )
-            }
-
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = loginViewModel.password,
-                onValueChange = { loginViewModel.password = it },
+                value = password,
+                onValueChange = { password = it },
                 label = { Text("Password") },
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth()
             )
 
-            if (loginViewModel.passwordError) {
+            if (loginError != null) {
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "The password must have at least 6 characters",
+                    text = loginError ?: "",
                     color = Color.Red,
-                    fontSize = 12.sp,
-                    modifier = Modifier.align(Alignment.Start)
+                    fontSize = 13.sp
                 )
             }
 
@@ -99,7 +88,16 @@ fun LoginScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    loginViewModel.onLoginClick()
+                    coroutineScope.launch {
+                        val user = userViewModel.getUserByEmailAndPassword(email, password)
+                        if (user != null) {
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(Screen.Login.route) { inclusive = true }
+                            }
+                        } else {
+                            loginError = "Invalid email or password"
+                        }
+                    }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -116,3 +114,5 @@ fun LoginScreen(navController: NavController) {
         }
     }
 }
+
+

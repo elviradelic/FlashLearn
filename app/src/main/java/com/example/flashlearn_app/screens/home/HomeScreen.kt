@@ -21,16 +21,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.flashlearn_app.R
-import com.example.flashlearn_app.Screen
-import com.example.flashlearn_app.viewmodel.DeckViewModel
+import com.example.flashlearn_app.navigation.Screen
 
+import com.example.flashlearn_app.viewmodel.DeckViewModel
 
 @Composable
 fun HomeScreen(
     navController: NavController,
-    deckViewModel: DeckViewModel
+    deckViewModel: DeckViewModel = hiltViewModel()
 ) {
     val backgroundColor = Color(0xFF0A1A33)
     val borderColor = Color(0xFF00A3FF)
@@ -159,4 +160,3 @@ fun HomeScreen(
         }
     }
 }
-

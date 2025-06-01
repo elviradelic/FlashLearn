@@ -10,22 +10,34 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.flashlearn_app.viewmodel.CardViewModel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @Composable
 fun EditCardScreen(
     cardId: Int,
-    initialFront: String,
-    initialBack: String,
-    cardViewModel: CardViewModel,
-    onNavigateBack: () -> Unit
+    front: String,
+    back: String,
+    onNavigateBack: () -> Unit,
+    cardViewModel: CardViewModel = hiltViewModel()
 ) {
     val backgroundColor = Color(0xFF0A1A33)
     val accentColor = Color(0xFF00A3FF)
 
-    var front by remember { mutableStateOf(initialFront) }
-    var back by remember { mutableStateOf(initialBack) }
+    var front by remember { mutableStateOf("") }
+    var back by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
+
+    // Pokupi karticu iz baze kada se ekran otvori
+    LaunchedEffect(cardId) {
+        cardViewModel.getCardById(cardId).collectLatest { card ->
+            front = card?.front ?: ""
+            back = card?.back ?: ""
+        }
+
+    }
 
     val textFieldColors = OutlinedTextFieldDefaults.colors(
         focusedTextColor = Color.White,
@@ -76,8 +88,10 @@ fun EditCardScreen(
 
         Button(
             onClick = {
-                cardViewModel.updateCard(cardId, front, back)
-                onNavigateBack()
+                coroutineScope.launch {
+                    cardViewModel.updateCardById(cardId, front, back)
+                    onNavigateBack()
+                }
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = accentColor)

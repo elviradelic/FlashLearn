@@ -10,15 +10,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.flashlearn_app.data.model.DeckEntity
+import com.example.flashlearn_app.viewmodel.DeckViewModel
+import kotlinx.coroutines.launch
 import com.example.flashlearn_app.data.model.Deck
 
 @Composable
 fun AddDeckScreen(
-    addDeck: (Deck) -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    deckViewModel: DeckViewModel = hiltViewModel()
 ) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
 
     val backgroundColor = Color(0xFF0A1A33)
     val accentColor = Color(0xFF00A3FF)
@@ -88,8 +93,13 @@ fun AddDeckScreen(
         Button(
             onClick = {
                 if (title.isNotBlank() && description.isNotBlank()) {
-                    addDeck(Deck(title = title, description = description))
-                    onNavigateBack()
+                    coroutineScope.launch {
+                        deckViewModel.insertDeck(
+                            Deck(title = title, description = description)
+                        )
+
+                        onNavigateBack()
+                    }
                 }
             },
             colors = ButtonDefaults.buttonColors(containerColor = accentColor),

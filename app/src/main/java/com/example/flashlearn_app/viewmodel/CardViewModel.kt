@@ -2,44 +2,69 @@ package com.example.flashlearn_app.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.flashlearn_app.data.model.Card
+import com.example.flashlearn_app.data.model.CardEntity
 import com.example.flashlearn_app.data.repository.CardRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CardViewModel : ViewModel() {
+@HiltViewModel
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+class CardViewModel @Inject constructor(
+    private val cardRepository: CardRepository
+) : ViewModel() {
 
-    private val repository = CardRepository()
-
-    // Držimo trenutno selektovani deck ID i naziv
     private val _selectedDeckId = MutableStateFlow(0)
-    private val _selectedDeckTitle = MutableStateFlow("")
-
-    val selectedDeckTitle: StateFlow<String> = _selectedDeckTitle
     val selectedDeckId: StateFlow<Int> = _selectedDeckId
 
-    // Filtrirani cardovi na osnovu deck ID-a
-    val cards: StateFlow<List<Card>> = combine(
-        repository.cards,
-        _selectedDeckId
-    ) { allCards, deckId ->
-        allCards.filter { it.deckId == deckId }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val cards: StateFlow<List<CardEntity>> = selectedDeckId
+        .flatMapLatest { deckId ->
+            cardRepository.getCardsForDeck(deckId)
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    fun setSelectedDeck(deckId: Int, deckTitle: String) {
+    fun setSelectedDeck(deckId: Int) {
         _selectedDeckId.value = deckId
-        _selectedDeckTitle.value = deckTitle
     }
 
-    fun addCard(card: Card) {
-        repository.addCard(card)
+    fun insertCard(card: CardEntity) {
+        viewModelScope.launch {
+            cardRepository.insert(card)
+        }
     }
 
-    fun deleteCard(card: Card) {
-        repository.deleteCard(card)
+    fun updateCard(card: CardEntity) {
+        viewModelScope.launch {
+            cardRepository.update(card)
+        }
     }
 
-    fun updateCard(cardId: Int, front: String, back: String) {
-        repository.updateCard(cardId, front, back)
+    fun deleteCard(card: CardEntity) {
+        viewModelScope.launch {
+            cardRepository.delete(card)
+        }
+    }
+
+    // 👇 DODATI METODA: Dohvati karticu po ID-u (za Edit ekran)
+    fun getCardById(id: Int): Flow<CardEntity?> {
+        return cardRepository.getCardById(id)
+    }
+
+    fun getCardsForDeck(deckId: Int): Flow<List<CardEntity>> {
+        return cardRepository.getCardsForDeck(deckId)
+    }
+
+    // 👇 DODATI METODA: Ažuriraj karticu samo preko ID + novih vrijednosti
+    fun updateCardById(id: Int, front: String, back: String) {
+        viewModelScope.launch {
+            cardRepository.getCardById(id).collect { card ->
+                card?.let {
+                    val updated = it.copy(front = front, back = back)
+                    cardRepository.update(updated)
+                }
+            }
+        }
     }
 
 }
